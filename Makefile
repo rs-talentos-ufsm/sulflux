@@ -33,19 +33,35 @@ install:
 	cd apps/frontend && npm install
 	@echo "🎉 Tudo pronto! Agora você pode rodar 'make dev-up' ou 'make test'."
 
+# ------------------------------------------------------------------------------
+# 2. Criar projeto novo a partir dos templates (limpa histórico e submódulos)
+# ------------------------------------------------------------------------------
+
+make start-project:
+	@echo "🚀 Iniciando configuração de um NOVO projeto a partir dos templates..."
+	@echo "-> 🧹 Limpando qualquer cache ou histórico antigo do Git..."
+	rm -rf .git/modules/apps .git/modules/packages
+	@echo "-> 🗑️ Removendo pastas residuais..."
+	rm -rf apps/backend apps/frontend packages/shared
+	@echo "-> 🔄 Atualizando submódulos..."
+	@$(MAKE) init
+
 # --- Tarefas Auxiliares Internas ---
 
 submodule-download:
-	git submodule update --init --recursive
-	@echo "-> Códigos dos submódulos sincronizados."
-	git submodule update --remote --merge
+	@echo "-> Sincronizando URLs dos submódulos caso tenham mudado..."
+	git submodule sync --recursive
+	@echo "-> Inicializando e atualizando o código base..."
+	git submodule update --init --recursive --force
+	@echo "-> Buscando a versão mais recente do remoto..."
+	git submodule update --remote --checkout --force
 	@echo "-> Códigos dos submódulos atualizados com o remoto."
 
 update:
 	@echo "-> Atualizando o orquestrador (raiz)..."
 	git pull
 	@echo "-> Puxando os commits mais recentes dos submódulos..."
-	git submodule update --remote --merge
+	git submodule update --remote --checkout --force
 	@echo "🎉 Ecossistema atualizado com sucesso!"
 
 setup-env-files:
@@ -79,7 +95,7 @@ setup-env-files:
 	fi
 	
 # ------------------------------------------------------------------------------
-# 2. Ambiente de Desenvolvimento (Docker)
+# 3. Ambiente de Desenvolvimento (Docker)
 # ------------------------------------------------------------------------------
 
 # Sobe o Frontend e Backend em modo anexo (mostrando logs combinados no terminal)
@@ -105,7 +121,7 @@ dev-reset:
 	@echo "Ambiente de desenvolvimento limpo e volumes apagados!"
 
 # ------------------------------------------------------------------------------
-# 3. Ambiente de Produção (Docker)
+# 4. Ambiente de Produção (Docker)
 # ------------------------------------------------------------------------------
 
 # Sobe a stack completa simulando ambiente de produção
@@ -120,7 +136,7 @@ prod-down:
 	cd apps/frontend && npm run prod-down
 
 # ------------------------------------------------------------------------------
-# 4. Qualidade e Testes
+# 5. Qualidade e Testes
 # ------------------------------------------------------------------------------
 
 # Dispara as baterias de testes isoladas de cada repositório sequencialmente
@@ -135,7 +151,7 @@ test:
 	@echo "Todas as baterias de testes foram finalizadas!"
 
 # ------------------------------------------------------------------------------
-# 5. Utilitários e Logs
+# 6. Utilitários e Logs
 # ------------------------------------------------------------------------------
 
 # Monitora em tempo real os logs do container do Backend
@@ -155,7 +171,7 @@ status:
 	git submodule status
 
 # ------------------------------------------------------------------------------
-# 6. Migrações de Banco de Dados
+# 7. Migrações de Banco de Dados
 # ------------------------------------------------------------------------------
 # Roda a migration dentro do container Docker (ideal se o banco roda via Docker)
 migrate:
@@ -178,7 +194,7 @@ migrate-reset:
 	cd apps/backend && npm run docker-migrate-reset
 
 # ------------------------------------------------------------------------------
-# 7. Shared Library
+# 8. Shared Library
 # ------------------------------------------------------------------------------
 # Atualiza a lib compartilhada (Shared) e gera os tipos
 shared-update:

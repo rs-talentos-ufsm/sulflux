@@ -83,7 +83,7 @@ make update
 Os contêineres do ecossistema precisam se comunicar através de uma rede interna nomeada. Para criá-la, insira no terminal:
 
 ```bash
-docker network create pgi-proa_network
+docker network create sulflux_network
 
 ```
 
