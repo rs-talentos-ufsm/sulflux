@@ -1,12 +1,12 @@
 [submodule "packages/shared"]
 	path = packages/shared
-	url = git@github.com:dorneles-laboratory/pgi-proa.shared.git
+	url = git@github.com:rs-talentos-ufsm/sulflux.shared.git
 	branch = main
 [submodule "apps/backend"]
 	path = apps/backend
-	url = git@github.com:dorneles-laboratory/pgi-proa.backend.git
+	url = git@github.com:rs-talentos-ufsm/sulflux.backend.git
 	branch = main
 [submodule "apps/frontend"]
 	path = apps/frontend
-	url = git@github.com:dorneles-laboratory/pgi-proa.frontend.git
+	url = git@github.com:rs-talentos-ufsm/sulflux.frontend.git
 	branch = main
