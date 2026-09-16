@@ -1,0 +1,21 @@
+import { prisma } from '../../infra/database';
+import { AppError } from '../../utils/AppError';
+import { CreateResourceDTO, ResourceResponseDTO } from '@lib/shared';
+
+export class ResourceService {
+  public async create(data: CreateResourceDTO, userId: string): Promise<ResourceResponseDTO> {
+    try {
+      const newResource = await prisma.resource.create({
+        data: {
+          ...data,
+          ownerId: userId,
+        },
+      });
+
+      return newResource as unknown as ResourceResponseDTO;
+    } catch (error) {
+      console.error('Erro ao criar recurso: ', error);
+      throw new AppError('Não foi possível criar o recurso devido a um erro interno.', 500);
+    }
+  }
+}

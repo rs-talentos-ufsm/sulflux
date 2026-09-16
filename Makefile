@@ -8,19 +8,21 @@
 # 1. Inicialização do Ecossistema
 # ------------------------------------------------------------------------------
 
-# PASSO 1: Baixa os códigos e prepara as cópias dos arquivos .env
-init: submodule-download setup-env-files
+# PASSO 1: Baixa os códigos, prepara as cópias dos arquivos .env e garante a rede Docker
+init: submodule-download setup-env-files setup-network
 	@echo ""
 	@echo "===================================================================="
-	@echo " 🚀 SUBMÓDULOS SINCRONIZADOS E ARQUIVOS .ENV PREPARADOS!"
+	@echo " 🚀 SUBMÓDULOS SINCRONIZADOS, REDE DOCKER E ARQUIVOS .ENV PREPARADOS!"
 	@echo "===================================================================="
-	@echo " Próximos passos obrigatórios antes de rodar o projeto:"
-	@echo " 1. Configure as variáveis de ambiente locais que foram criadas em:"
+	@echo " Próximos passos para rodar o projeto:"
+	@echo " 1. Os arquivos de ambiente foram criados a partir dos .env.example:"
 	@echo "    -> apps/backend/.env.development"
 	@echo "    -> apps/backend/.env.test"
 	@echo "    -> apps/frontend/.env.development"
-	@echo " 2. Após ajustar os arquivos, execute o comando para instalar tudo:"
+	@echo " 2. Execute o comando para instalar as dependências de todos os módulos:"
 	@echo "    make install"
+	@echo " 3. Inicie o ecossistema com:"
+	@echo "    make dev-upd (modo daemon) ou make dev-up (com logs)"
 	@echo "===================================================================="
 
 # PASSO 2: Instala as dependências (Só deve ser rodado APÓS configurar os .env)
@@ -64,6 +66,10 @@ update:
 	git submodule update --remote --checkout --force
 	@echo "🎉 Ecossistema atualizado com sucesso!"
 
+setup-network:
+	@echo "-> Verificando rede Docker..."
+	@docker network inspect sulflux_network >/dev/null 2>&1 || docker network create sulflux_network >/dev/null 2>&1 && echo "   [✓] Rede Docker sulflux_network pronta." || echo "   [!] Aviso: Docker indisponível no momento para criar a rede sulflux_network."
+
 setup-env-files:
 	@echo "-> Preparando arquivos de ambiente..."
 	@if [ -f apps/backend/.env.example ]; then \
@@ -75,9 +81,15 @@ setup-env-files:
 	else \
 		echo "   [!] Alerta: apps/backend/.env.example não encontrado!"; \
 	fi
-	@if [ -f apps/backend/.env.example ]; then \
+	@if [ -f apps/backend/.env.test.example ]; then \
 		if [ ! -f apps/backend/.env.test ]; then \
-			cp apps/backend/.env.example apps/backend/.env.test && echo "   [✓] apps/backend/.env.test criado."; \
+			cp apps/backend/.env.test.example apps/backend/.env.test && echo "   [✓] apps/backend/.env.test criado a partir de .env.test.example."; \
+		else \
+			echo "   [i] apps/backend/.env.test já existe."; \
+		fi \
+	elif [ -f apps/backend/.env.example ]; then \
+		if [ ! -f apps/backend/.env.test ]; then \
+			cp apps/backend/.env.example apps/backend/.env.test && echo "   [✓] apps/backend/.env.test criado a partir de .env.example."; \
 		else \
 			echo "   [i] apps/backend/.env.test já existe."; \
 		fi \

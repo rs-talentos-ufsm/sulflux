@@ -1,0 +1,71 @@
+import { z, registry } from '../../lib/registry';
+
+export const createResourceSchema = registry.register(
+  'CreateResourceRequest',
+  z.object({
+    name: z
+      .string({ message: 'O nome é obrigatório.' })
+      .min(3, { message: 'O nome deve ter no mínimo 3 caracteres.' })
+      .openapi({
+        description: 'Nome identificador do recurso',
+        example: 'Painel Entrada Principal',
+      }),
+
+    description: z
+      .string()
+      .optional()
+      .openapi({
+        description: 'Descrição opcional do recurso',
+        example: 'Mural digital localizado no saguão do prédio',
+      }),
+
+    status: z
+      .enum(['ACTIVE', 'INACTIVE'], {
+        message: 'Status deve ser ACTIVE ou INACTIVE.',
+      })
+      .default('ACTIVE')
+      .openapi({
+        description: 'Status do recurso no sistema',
+        example: 'ACTIVE',
+      }),
+  }),
+);
+
+export const updateResourceSchema = registry.register(
+  'UpdateResourceRequest',
+  createResourceSchema
+    .partial()
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'Pelo menos um campo deve ser fornecido para atualização.',
+    }),
+);
+
+export const resourceResponseSchema = registry.register(
+  'ResourceResponse',
+  z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    description: z.string().nullable().optional(),
+    status: z.enum(['ACTIVE', 'INACTIVE']),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+  }),
+);
+
+export const resourceIdSchema = z.object({
+  id: z
+    .string()
+    .uuid({
+      error: ({ input }) =>
+        input === undefined
+          ? 'O ID é obrigatório.'
+          : 'O ID do recurso deve ser um UUID válido.',
+    })
+    .openapi({
+      param: {
+        name: 'id',
+        in: 'path',
+      },
+      description: 'UUID identificador exclusivo do recurso',
+    }),
+});

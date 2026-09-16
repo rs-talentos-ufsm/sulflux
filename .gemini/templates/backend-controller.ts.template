@@ -1,0 +1,39 @@
+import { Request, Response, NextFunction } from 'express';
+import { ResourceService } from './resource.service';
+import { createResourceSchema, ResourceResponseDTO } from '@lib/shared';
+
+export class ResourceController {
+  private resourceService = new ResourceService();
+
+  public create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const validation = createResourceSchema.safeParse(req.body);
+
+      if (!validation.success) {
+        res.status(400).json({
+          type: '/errors/validation-error',
+          title: 'Erro de validação nos dados enviados',
+          status: 400,
+          detail: 'Um ou mais campos falharam na validação.',
+          errors: validation.error.flatten().fieldErrors,
+        });
+        return;
+      }
+
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({
+          type: '/errors/unauthorized',
+          title: 'Usuário não autenticado',
+          status: 401,
+        });
+        return;
+      }
+
+      const newResource: ResourceResponseDTO = await this.resourceService.create(validation.data, userId);
+      res.status(201).json(newResource);
+    } catch (error: unknown) {
+      next(error);
+    }
+  };
+}

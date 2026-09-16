@@ -1,0 +1,15 @@
+import { z } from '../../lib/registry';
+import {
+  createResourceSchema,
+  updateResourceSchema,
+  resourceResponseSchema,
+  resourceIdSchema,
+} from './resource.schemas';
+import type { PaginatedResultDTO } from '../../common/common.types';
+
+export type CreateResourceDTO = z.infer<typeof createResourceSchema>;
+export type UpdateResourceDTO = z.infer<typeof updateResourceSchema>;
+export type ResourceResponseDTO = z.infer<typeof resourceResponseSchema>;
+export type ResourceIdDTO = z.infer<typeof resourceIdSchema>;
+export type PaginatedResourcesDTO =
+  PaginatedResultDTO<ResourceResponseDTO>;

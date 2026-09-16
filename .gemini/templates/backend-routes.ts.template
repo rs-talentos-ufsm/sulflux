@@ -1,0 +1,33 @@
+import { Router } from 'express';
+import { registry, createResourceSchema, resourceResponseSchema, rfc7807ErrorSchema } from '@lib/shared';
+import { ResourceController } from './resource.controller';
+import { ensureAuthenticated } from '../../middleware/ensureAuthenticated';
+
+const router = Router();
+const resourceController = new ResourceController();
+
+registry.registerPath({
+  method: 'post',
+  path: '/resources',
+  summary: 'Cria um novo recurso',
+  tags: ['Resource'],
+  security: [{ cookieAuth: [] }],
+  request: {
+    body: { content: { 'application/json': { schema: createResourceSchema } } },
+  },
+  responses: {
+    201: {
+      description: 'Recurso criado com sucesso',
+      content: { 'application/json': { schema: resourceResponseSchema } },
+    },
+    400: {
+      description: 'Dados inválidos',
+      content: { 'application/json': { schema: rfc7807ErrorSchema } },
+    },
+  },
+});
+
+router.use(ensureAuthenticated);
+router.post('/', resourceController.create);
+
+export default router;

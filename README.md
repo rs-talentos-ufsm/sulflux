@@ -16,50 +16,50 @@ Ideal para iniciar novos produtos sem gastar dias configurando linting, banco de
 
 Para um entendimento profundo da arquitetura e das regras do sistema, consulte nossos guias detalhados:
 
-* [1. Visão Geral e Resultado Esperado](https://github.com/dornelesfernando/template/tree/main/docs/expected_outcome.md)
-* [2. Arquitetura do Monorepo](https://github.com/dornelesfernando/template/tree/main/docs/architecture.md)
-* [3. Pré-requisitos e Setup da Máquina](https://github.com/dornelesfernando/template/tree/main/docs/prerequisites.md)
-* [4. Gerenciamento de Submódulos](https://github.com/dornelesfernando/template/tree/main/docs/submodules.md)
-* [5. Gerenciamento com Makefile](https://github.com/dornelesfernando/template/tree/main/docs/makefile.md)
+* [1. Visão Geral e Resultado Esperado](docs/expected_outcome.md)
+* [2. Arquitetura do Monorepo](docs/architecture.md)
+* [3. Pré-requisitos e Setup da Máquina](docs/prerequisites.md)
+* [4. Gerenciamento de Submódulos](docs/submodules.md)
+* [5. Gerenciamento com Makefile](docs/makefile.md)
+* [6. Inicialização Automatizada via Antigravity / AI Agent](docs/agent-bootstrap.md)
 
 ---
 
-## 🚀 Quick Start (Clonagem e Submódulos)
+## 🤖 Inicialização Rápida com o Antigravity (AI Agent)
+
+Se você estiver utilizando o **Antigravity CLI** ou outro agente de IA, basta fornecer o link deste repositório com a seguinte instrução:
+
+```text
+Clone o repositório https://github.com/rs-talentos-ufsm/sulflux.git com todos os submódulos, configure os arquivos de ambiente a partir dos .env.example, instale as dependências, suba os containers Docker e aplique as migrations, deixando o Frontend e Backend funcionais.
+```
+
+O agente seguirá o passo a passo descrito em [`docs/agent-bootstrap.md`](docs/agent-bootstrap.md).
+
+---
+
+## 🚀 Quick Start Manual (Clonagem e Submódulos)
 
 Abaixo está o passo a passo resumido para baixar a infraestrutura completa para a sua máquina local (Ubuntu/WSL).
 
-### 1. Clonando o Monorepo Base
+### 1. Clonando o Monorepo com Submódulos
 
 > **⚠️ Atenção (Usuários Windows):** Clone o projeto sempre dentro do sistema de arquivos nativo do Linux (ex: `~/projects`), nunca no `/mnt/c/` para garantir performance.
 
 ```bash
-# 1. Clone a "casca" do orquestrador
-git clone git@github.com:dornelesfernando/template.git
-
-# 2. Acesse a pasta
-cd template
-
+# Clone o orquestrador e todos os submódulos de uma só vez
+git clone --recurse-submodules git@github.com:rs-talentos-ufsm/sulflux.git
+cd sulflux
 ```
 
-### 2. Trazendo os Submódulos para o Projeto
-> **⚠️ Atenção:** Leia o arquivo `docs/submodules.md` para entender o funcionamento dos submódulos e como eles se encaixam na arquitetura do monorepo.
+### 2. Inicializando os Ambientes (.env) e Rede Docker
 
-Execute os devidos comandos para baixar o código fonte real do Frontend, Backend e Shared e, após isso, prossiga para o próximo passo.
-
-## 📦 Gerenciamento dos Submódulos
-
-### 3. Inicializando os Submódulos (Obrigatório no 1º Acesso)
-
-Como este projeto utiliza a arquitetura de Monorepo orquestrado, o comando `git clone` que você executou acima baixa apenas a "casca" do repositório principal. As pastas do Frontend, Backend e Shared estarão vazias.
-
-Para baixar o código fonte real de cada aplicação, execute dentro da pasta `template`:
+Execute o comando de inicialização automática:
 
 ```bash
 make init
-
 ```
 
-*(O Git lerá o arquivo `.gitmodules` e fará o clone automático dos repositórios corretos para dentro de `apps/frontend`, `apps/backend` e `packages/shared`).*
+*(O `make init` sincroniza os submódulos, copia os `.env.example` diretamente para `.env.development` com credenciais prontas para dev e cria a rede Docker `sulflux_network`).*
 
 ### 4. Boas Práticas: Atualização Diária
 

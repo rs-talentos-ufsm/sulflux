@@ -1,0 +1,6 @@
+export const ResourceNature = {
+  Exemplo: 'Exemplo',
+} as const;
+
+export type EnumResourceNature =
+  (typeof ResourceNature)[keyof typeof ResourceNature];
