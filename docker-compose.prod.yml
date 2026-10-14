@@ -1,0 +1,115 @@
+name: sulflux-stack
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sulflux_db_prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-sulflux_db}
+      POSTGRES_USER: ${DB_USER:-user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-UmaSenhaSuperSegura123}
+    volumes:
+      - sulflux_db_data:/var/lib/postgresql/data
+    networks:
+      - project_network
+    deploy:
+      resources:
+        limits:
+          memory: 120M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-user} -d ${DB_NAME:-sulflux_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: sulflux_minio_prod
+    command: server /data --console-address ":9001"
+    restart: always
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - sulflux_minio_data:/data
+    networks:
+      - project_network
+      - gateway_net
+    deploy:
+      resources:
+        limits:
+          memory: 96M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    image: sulflux_backend_prod
+    container_name: sulflux_backend_prod
+    restart: always
+    env_file:
+      - ./.env.production
+    environment:
+      NODE_ENV: production
+      BACKEND_PORT: 5001
+      API_URL: https://api-sulflux.dorneles.dev/api
+      FRONTEND_URL: https://sulflux.dorneles.dev
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-sulflux_db}
+      DB_USER: ${DB_USER:-user}
+      DB_PASSWORD: ${DB_PASSWORD:-UmaSenhaSuperSegura123}
+      DATABASE_URL: postgresql://${DB_USER:-user}:${DB_PASSWORD:-UmaSenhaSuperSegura123}@db:5432/${DB_NAME:-sulflux_db}?schema=public
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_PUBLIC_URL: https://storage-sulflux.dorneles.dev
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-sulflux-media}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://obs_jaeger:4318/v1/traces
+      OTEL_SERVICE_NAME: sulflux-backend
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash}
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - project_network
+      - gateway_net
+    deploy:
+      resources:
+        limits:
+          memory: 180M
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: https://api-sulflux.dorneles.dev
+    image: sulflux_frontend_prod
+    container_name: sulflux_frontend_prod
+    restart: always
+    networks:
+      - gateway_net
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+
+volumes:
+  sulflux_db_data:
+  sulflux_minio_data:
+
+networks:
+  project_network:
+    name: sulflux_network
+  gateway_net:
+    external: true

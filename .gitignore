@@ -25,3 +25,6 @@ Thumbs.db
 *.tmp
 
 apps/shared
+*.tgz
+lib-shared*.tgz
+auxiliar/
