@@ -227,8 +227,8 @@ build-all: build-shared dev-network
 # Sobe os containers de desenvolvimento em background (modo daemon)
 dev-upd: dev-network build-shared
 	@echo "-> [Docker] Iniciando stack de desenvolvimento..."
-	cd apps/backend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up -d -V
-	cd apps/frontend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up -d -V
+	cd apps/backend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up -d --build -V
+	cd apps/frontend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up -d --build -V
 	@echo "🚀 Stack de desenvolvimento ativa:"
 	@echo "   • Frontend:      http://localhost:5174"
 	@echo "   • Backend API:   http://localhost:5001/api"
@@ -240,8 +240,8 @@ dev-upd: dev-network build-shared
 
 # Sobe em modo interativo com logs anexados
 dev-up: dev-network build-shared
-	cd apps/backend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up -V & \
-	cd apps/frontend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up -V
+	cd apps/backend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up --build -V & \
+	cd apps/frontend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up --build -V
 
 # Pipeline de CD Local completa (Dev):
 # Pull 'dev' -> CI Local -> BuildKit Images -> Start Daemon -> Migrations -> Prune

@@ -14,7 +14,7 @@
 **Sulflux** é uma ferramenta de gestão ambiental avançada focada em métricas de sustentabilidade, análises hidrológicas e monitoramento estratégico de carbono. A plataforma centraliza dados ambientais, permite rastreamento de indicadores de sustentabilidade e viabiliza análises e relatórios para tomada de decisão ambiental.
 
 - **Tipo:** Environmental Management Platform / Sustainability Analytics
-- **Licença:** AGPLv3
+- **Licença:** Licença Pessoal (Fernando Dorneles da Silva)
 - **Organização GitHub:** `rs-talentos-ufsm`
 - **Repositório Orquestrador:** `rs-talentos-ufsm/sulflux`
 - **Status:** 🟡 Em desenvolvimento — fase inicial de construção do domínio
@@ -126,7 +126,7 @@ O Sulflux trabalhará com entidades relacionadas à **gestão ambiental**:
 5. **Nunca duplicar validações** entre Frontend e Backend — use sempre os contratos do `@lib/shared`.
 6. **Conventional Commits:** Padrão semântico obrigatório (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
 7. **Vitest:** Testes unitários e de integração obrigatórios para novos módulos.
-8. **AGPLv3:** Licença obrigatória em todos os submódulos.
+8. **Licença Pessoal:** Propriedade intelectual e licença pessoal exclusiva de Fernando Dorneles da Silva.
 
 ### Padrão de Arquitetura Backend
 ```
