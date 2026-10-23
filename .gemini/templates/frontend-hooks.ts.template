@@ -1,17 +1,72 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../api/api';
-import type { CreateResourceDTO, ResourceResponseDTO } from '@lib/shared';
+import type {
+  Create__PascalCase__DTO,
+  Update__PascalCase__DTO,
+  __PascalCase__ResponseDTO,
+  Paginated__PascalCasePlural__DTO,
+  __PascalCase__QueryDTO,
+} from '@lib/shared';
 
-export const useCreateResource = () => {
+export const use__PascalCasePlural__ = (filters: __PascalCase__QueryDTO = {}) => {
+  return useQuery<Paginated__PascalCasePlural__DTO>({
+    queryKey: ['__kebabCasePlural__', filters],
+    queryFn: async () => {
+      const response = await api.get('/api/__kebabCasePlural__', { params: filters });
+      return response.data;
+    },
+  });
+};
+
+export const use__PascalCase__ = (id: string) => {
+  return useQuery<__PascalCase__ResponseDTO>({
+    queryKey: ['__kebabCasePlural__', id],
+    queryFn: async () => {
+      const response = await api.get(`/api/__kebabCasePlural__/${id}`);
+      return response.data;
+    },
+    enabled: Boolean(id),
+  });
+};
+
+export const useCreate__PascalCase__ = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<ResourceResponseDTO, Error, CreateResourceDTO>({
+  return useMutation<__PascalCase__ResponseDTO, Error, Create__PascalCase__DTO>({
     mutationFn: async (data) => {
-      const response = await api.post('/api/resources', data);
+      const response = await api.post('/api/__kebabCasePlural__', data);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resources'] });
+      queryClient.invalidateQueries({ queryKey: ['__kebabCasePlural__'] });
+    },
+  });
+};
+
+export const useUpdate__PascalCase__ = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<__PascalCase__ResponseDTO, Error, { id: string; data: Update__PascalCase__DTO }>({
+    mutationFn: async ({ id, data }) => {
+      const response = await api.put(`/api/__kebabCasePlural__/${id}`, data);
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['__kebabCasePlural__'] });
+      queryClient.invalidateQueries({ queryKey: ['__kebabCasePlural__', variables.id] });
+    },
+  });
+};
+
+export const useDelete__PascalCase__ = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
+      await api.delete(`/api/__kebabCasePlural__/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['__kebabCasePlural__'] });
     },
   });
 };

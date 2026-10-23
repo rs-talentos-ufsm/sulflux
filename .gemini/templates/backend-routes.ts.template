@@ -1,24 +1,32 @@
 import { Router } from 'express';
-import { registry, createResourceSchema, resourceResponseSchema, rfc7807ErrorSchema } from '@lib/shared';
-import { ResourceController } from './resource.controller';
+import {
+  registry,
+  create__PascalCase__Schema,
+  update__PascalCase__Schema,
+  __camelCase__ResponseSchema,
+  paginated__PascalCasePlural__Schema,
+  rfc7807ErrorSchema,
+} from '@lib/shared';
+import { __PascalCase__Controller } from './__kebabCase__.controller';
 import { ensureAuthenticated } from '../../middleware/ensureAuthenticated';
 
 const router = Router();
-const resourceController = new ResourceController();
+const __camelCase__Controller = new __PascalCase__Controller();
 
+// Documentação OpenAPI - POST /
 registry.registerPath({
   method: 'post',
-  path: '/resources',
-  summary: 'Cria um novo recurso',
-  tags: ['Resource'],
+  path: '/__kebabCasePlural__',
+  summary: 'Cria um novo __kebabCase__',
+  tags: ['__PascalCase__'],
   security: [{ cookieAuth: [] }],
   request: {
-    body: { content: { 'application/json': { schema: createResourceSchema } } },
+    body: { content: { 'application/json': { schema: create__PascalCase__Schema } } },
   },
   responses: {
     201: {
-      description: 'Recurso criado com sucesso',
-      content: { 'application/json': { schema: resourceResponseSchema } },
+      description: '__PascalCase__ criado com sucesso',
+      content: { 'application/json': { schema: __camelCase__ResponseSchema } },
     },
     400: {
       description: 'Dados inválidos',
@@ -27,7 +35,27 @@ registry.registerPath({
   },
 });
 
+// Documentação OpenAPI - GET /
+registry.registerPath({
+  method: 'get',
+  path: '/__kebabCasePlural__',
+  summary: 'Lista __kebabCasePlural__ com paginação',
+  tags: ['__PascalCase__'],
+  security: [{ cookieAuth: [] }],
+  responses: {
+    200: {
+      description: 'Lista paginada de __kebabCasePlural__',
+      content: { 'application/json': { schema: paginated__PascalCasePlural__Schema } },
+    },
+  },
+});
+
 router.use(ensureAuthenticated);
-router.post('/', resourceController.create);
+
+router.post('/', __camelCase__Controller.create);
+router.get('/', __camelCase__Controller.list);
+router.get('/:id', __camelCase__Controller.getById);
+router.put('/:id', __camelCase__Controller.update);
+router.delete('/:id', __camelCase__Controller.delete);
 
 export default router;

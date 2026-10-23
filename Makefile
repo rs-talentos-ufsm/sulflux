@@ -26,6 +26,7 @@ help:
 	@echo "====================================================================="
 	@echo "  [MAPEAMENTO DE PORTAS LOCAIS]"
 	@echo "   • Frontend:      http://localhost:5174"
+	@echo "   • Admin Panel:   http://localhost:5184"
 	@echo "   • Backend API:   http://localhost:5001/api"
 	@echo "   • Swagger UI:    http://localhost:5001/api-docs"
 	@echo "   • MinIO API:     http://localhost:9005"
@@ -185,15 +186,29 @@ ci-local:
 	@echo " ✅ PIPELINE DE CI LOCAL: 100% APROVADA!"
 	@echo "===================================================================="
 
-# Roda apenas a suíte de testes Vitest de cada pacote
+# Roda a suíte de testes Vitest de cada pacote
 test:
 	@echo "-> Testando Shared..."
 	cd packages/shared && npm run test
-	@echo "-> Testando Backend (com banco efêmero)..."
-	cd apps/backend && npm run test
+	@echo "-> Testando Backend (unitários)..."
+	cd apps/backend && npm run test:unit
 	@echo "-> Testando Frontend..."
 	cd apps/frontend && npm run test
+	@echo "-> Testando Admin..."
+	cd apps/admin && npm run test
 	@echo "✅ Todas as baterias de testes foram finalizadas com sucesso!"
+
+admin-dev:
+	@echo "🚀 Iniciando Painel Administrativo Sulflux em http://localhost:5184..."
+	cd apps/admin && npm run dev
+
+admin-build:
+	@echo "📦 Compilando Painel Administrativo Sulflux..."
+	cd apps/admin && npm run build
+
+admin-test:
+	@echo "🧪 Executando testes unitários do Painel Administrativo..."
+	cd apps/admin && npm run test
 
 # ------------------------------------------------------------------------------
 # 3. CD Local & Orquestração Docker Dev (Docker Compose V2 + BuildKit)
@@ -376,3 +391,47 @@ prune:
 # Limpeza completa e profunda
 clean-all: dev-down prune
 	@echo "🧹 Limpeza completa concluída."
+# ==============================================================================
+# 🚀 Esteira de Automação de Features (Vertical Slice Scaffolding)
+# ==============================================================================
+
+.PHONY: feature-new watch-shared feature-check feature-commit
+
+feature-new:
+	@if [ -z "$(name)" ]; then \
+		echo "❌ Erro: Informe o nome da feature. Ex: make feature-new name=announcement"; \
+		exit 1; \
+	fi
+	@node .gemini/scripts/scaffold-feature.mjs $(name)
+
+watch-shared:
+	@echo "-> [Shared] Modo watch ativado em packages/shared..."
+	@cd packages/shared && (npm run dev 2>/dev/null || npm run build:watch 2>/dev/null || npx tsc --watch)
+
+feature-check:
+	@echo "-> [1/4] Verificando contratos em packages/shared..."
+	@cd packages/shared && npm run build
+	@echo "-> [2/4] Verificando tipagem e testes no backend..."
+	@cd apps/backend && npx tsc --noEmit && npm run test -- --run
+	@echo "-> [3/4] Verificando tipagem e testes no frontend..."
+	@cd apps/frontend && npx tsc -b && npm run test -- --run
+	@echo "-> [4/4] Verificando conformidade com regras CSS Modules (sem Tailwind)..."
+	@! grep -r "tailwindcss" apps/frontend/package.json 2>/dev/null || (echo "❌ Tailwind detectado!" && exit 1)
+	@echo "✅ Feature aprovada em todas as camadas!"
+
+feature-commit:
+	@if [ -z "$(msg)" ]; then \
+		echo "❌ Erro: Informe a mensagem do commit. Ex: make feature-commit msg='feat(device): add device management'"; \
+		exit 1; \
+	fi
+	@echo "-> [Git] Commitando em cascata nos submódulos modificados..."
+	@for sub in packages/shared apps/backend apps/frontend; do \
+		if [ -d "$$sub" ] && [ -n "$$(git -C $$sub status -s 2>/dev/null)" ]; then \
+			echo "   [✓] Commit em $$sub..."; \
+			git -C $$sub add . && git -C $$sub commit -m "$(msg)"; \
+		fi \
+	done
+	@echo "   [✓] Atualizando referências na raiz orquestradora..."
+	@git add packages/shared apps/backend apps/frontend 2>/dev/null || true
+	@git commit -m "$(msg)" || echo "Sem mudanças na raiz."
+	@echo "🚀 Commits concluídos com sucesso em todas as camadas!"

@@ -1,0 +1,35 @@
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { __PascalCasePlural__ } from '../../src/pages/__kebabCasePlural__/__PascalCasePlural__';
+import * as hooks from '../../src/hooks/use__PascalCasePlural__';
+
+vi.mock('../../src/hooks/use__PascalCasePlural__');
+
+describe('__PascalCasePlural__ Page', () => {
+  it('renders loading state initially', () => {
+    vi.spyOn(hooks, 'use__PascalCasePlural__').mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      error: null,
+    } as any);
+
+    render(<__PascalCasePlural__ />);
+    expect(screen.getByText(/carregando/i)).toBeInTheDocument();
+  });
+
+  it('renders data cards when loaded', () => {
+    vi.spyOn(hooks, 'use__PascalCasePlural__').mockReturnValue({
+      data: {
+        data: [{ id: '1', name: 'Item Teste', status: 'ACTIVE' } as any],
+        meta: { page: 1, limit: 10, total: 1, totalPages: 1 },
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    } as any);
+
+    render(<__PascalCasePlural__ />);
+    expect(screen.getByText('Item Teste')).toBeInTheDocument();
+  });
+});

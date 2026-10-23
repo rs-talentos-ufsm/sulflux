@@ -1,22 +1,22 @@
 import { z, registry } from '../../lib/registry';
 
-export const createResourceSchema = registry.register(
-  'CreateResourceRequest',
+export const create__PascalCase__Schema = registry.register(
+  'Create__PascalCase__Request',
   z.object({
     name: z
       .string({ message: 'O nome é obrigatório.' })
       .min(3, { message: 'O nome deve ter no mínimo 3 caracteres.' })
       .openapi({
-        description: 'Nome identificador do recurso',
-        example: 'Painel Entrada Principal',
+        description: 'Nome identificador do __kebabCase__',
+        example: '__PascalCase__ Principal',
       }),
 
     description: z
       .string()
       .optional()
       .openapi({
-        description: 'Descrição opcional do recurso',
-        example: 'Mural digital localizado no saguão do prédio',
+        description: 'Descrição opcional do __kebabCase__',
+        example: 'Descrição detalhada do __kebabCase__',
       }),
 
     status: z
@@ -25,23 +25,23 @@ export const createResourceSchema = registry.register(
       })
       .default('ACTIVE')
       .openapi({
-        description: 'Status do recurso no sistema',
+        description: 'Status do __kebabCase__ no sistema',
         example: 'ACTIVE',
       }),
   }),
 );
 
-export const updateResourceSchema = registry.register(
-  'UpdateResourceRequest',
-  createResourceSchema
+export const update__PascalCase__Schema = registry.register(
+  'Update__PascalCase__Request',
+  create__PascalCase__Schema
     .partial()
     .refine((data) => Object.keys(data).length > 0, {
       message: 'Pelo menos um campo deve ser fornecido para atualização.',
     }),
 );
 
-export const resourceResponseSchema = registry.register(
-  'ResourceResponse',
+export const __camelCase__ResponseSchema = registry.register(
+  '__PascalCase__Response',
   z.object({
     id: z.string().uuid(),
     name: z.string(),
@@ -52,20 +52,15 @@ export const resourceResponseSchema = registry.register(
   }),
 );
 
-export const resourceIdSchema = z.object({
-  id: z
-    .string()
-    .uuid({
-      error: ({ input }) =>
-        input === undefined
-          ? 'O ID é obrigatório.'
-          : 'O ID do recurso deve ser um UUID válido.',
-    })
-    .openapi({
-      param: {
-        name: 'id',
-        in: 'path',
-      },
-      description: 'UUID identificador exclusivo do recurso',
+export const paginated__PascalCasePlural__Schema = registry.register(
+  'Paginated__PascalCasePlural__Response',
+  z.object({
+    data: z.array(__camelCase__ResponseSchema),
+    meta: z.object({
+      page: z.number().int().positive(),
+      limit: z.number().int().positive(),
+      total: z.number().int().nonnegative(),
+      totalPages: z.number().int().nonnegative(),
     }),
-});
+  }),
+);

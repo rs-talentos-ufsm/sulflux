@@ -1,21 +1,115 @@
 import { prisma } from '../../infra/database';
 import { AppError } from '../../utils/AppError';
-import { CreateResourceDTO, ResourceResponseDTO } from '@lib/shared';
+import type {
+  Create__PascalCase__DTO,
+  Update__PascalCase__DTO,
+  __PascalCase__ResponseDTO,
+  Paginated__PascalCasePlural__DTO,
+  __PascalCase__QueryDTO,
+} from '@lib/shared';
 
-export class ResourceService {
-  public async create(data: CreateResourceDTO, userId: string): Promise<ResourceResponseDTO> {
+export class __PascalCase__Service {
+  public async create(data: Create__PascalCase__DTO, userId: string): Promise<__PascalCase__ResponseDTO> {
     try {
-      const newResource = await prisma.resource.create({
+      const item = await (prisma as any).__camelCase__.create({
         data: {
           ...data,
           ownerId: userId,
         },
       });
 
-      return newResource as unknown as ResourceResponseDTO;
+      return item as unknown as __PascalCase__ResponseDTO;
     } catch (error) {
-      console.error('Erro ao criar recurso: ', error);
-      throw new AppError('Não foi possível criar o recurso devido a um erro interno.', 500);
+      console.error('Erro ao criar __kebabCase__: ', error);
+      throw new AppError('Não foi possível criar o __kebabCase__ devido a um erro interno.', 500);
+    }
+  }
+
+  public async findAll(filters: __PascalCase__QueryDTO): Promise<Paginated__PascalCasePlural__DTO> {
+    try {
+      const page = filters.page && filters.page > 0 ? Number(filters.page) : 1;
+      const limit = filters.limit && filters.limit > 0 ? Number(filters.limit) : 10;
+      const skip = (page - 1) * limit;
+
+      const where: any = {};
+      if (filters.status) {
+        where.status = filters.status;
+      }
+      if (filters.search) {
+        where.name = { contains: filters.search, mode: 'insensitive' };
+      }
+
+      const [items, total] = await Promise.all([
+        (prisma as any).__camelCase__.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+        (prisma as any).__camelCase__.count({ where }),
+      ]);
+
+      return {
+        data: items as unknown as __PascalCase__ResponseDTO[],
+        meta: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit) || 1,
+        },
+      };
+    } catch (error) {
+      console.error('Erro ao listar __kebabCasePlural__: ', error);
+      throw new AppError('Não foi possível listar os __kebabCasePlural__.', 500);
+    }
+  }
+
+  public async findById(id: string): Promise<__PascalCase__ResponseDTO> {
+    try {
+      const item = await (prisma as any).__camelCase__.findUnique({
+        where: { id },
+      });
+
+      if (!item) {
+        throw new AppError('__PascalCase__ não encontrado.', 404);
+      }
+
+      return item as unknown as __PascalCase__ResponseDTO;
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      console.error('Erro ao buscar __kebabCase__: ', error);
+      throw new AppError('Erro ao buscar o __kebabCase__.', 500);
+    }
+  }
+
+  public async update(id: string, data: Update__PascalCase__DTO): Promise<__PascalCase__ResponseDTO> {
+    try {
+      await this.findById(id);
+
+      const updated = await (prisma as any).__camelCase__.update({
+        where: { id },
+        data,
+      });
+
+      return updated as unknown as __PascalCase__ResponseDTO;
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      console.error('Erro ao atualizar __kebabCase__: ', error);
+      throw new AppError('Erro ao atualizar o __kebabCase__.', 500);
+    }
+  }
+
+  public async delete(id: string): Promise<void> {
+    try {
+      await this.findById(id);
+
+      await (prisma as any).__camelCase__.delete({
+        where: { id },
+      });
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      console.error('Erro ao deletar __kebabCase__: ', error);
+      throw new AppError('Erro ao remover o __kebabCase__.', 500);
     }
   }
 }

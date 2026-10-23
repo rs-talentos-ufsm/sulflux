@@ -1,0 +1,2 @@
+export * from './__kebabCase__.schemas';
+export * from './__kebabCase__.types';
