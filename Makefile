@@ -232,7 +232,7 @@ build-shared:
 	fi
 
 # Constrói as imagens Docker de Backend e Frontend usando BuildKit e Cache
-build-all: build-shared dev-network
+build-all: build-shared prod-prep dev-network
 	@echo "-> [Docker] Construindo imagem do Backend com BuildKit..."
 	cd apps/backend && DOCKER_BUILDKIT=1 docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development build
 	@echo "-> [Docker] Construindo imagem do Frontend com BuildKit..."
@@ -240,7 +240,7 @@ build-all: build-shared dev-network
 	@echo "✅ [Docker] Imagens de desenvolvimento construídas com sucesso!"
 
 # Sobe os containers de desenvolvimento em background (modo daemon)
-dev-upd: dev-network build-shared
+dev-upd: dev-network build-shared prod-prep
 	@echo "-> [Docker] Iniciando stack de desenvolvimento..."
 	cd apps/backend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up -d --build -V
 	cd apps/frontend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up -d --build -V
@@ -254,7 +254,7 @@ dev-upd: dev-network build-shared
 	@echo "   • PostgreSQL:    localhost:5434"
 
 # Sobe em modo interativo com logs anexados
-dev-up: dev-network build-shared
+dev-up: dev-network build-shared prod-prep
 	cd apps/backend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up --build -V & \
 	cd apps/frontend && docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.development up --build -V
 
